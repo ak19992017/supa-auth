@@ -1,8 +1,4 @@
-// ignore_for_file: unused_import
-
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:supa_auth/constants/authentication.notifier.dart';
 import 'package:supa_auth/constants/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -30,8 +26,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final AuthenticationNotifier authenticationNotifier =
-        context.read<AuthenticationNotifier>();
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(10),
@@ -50,7 +44,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 const Text('Already having an account?'),
                 TextButton(
-                  onPressed: () => Navigator.pushNamed(context, 'signin'),
+                  onPressed: () => Navigator.pushNamed(context, '/signin'),
                   child: const Text('Sign In'),
                 )
               ],
@@ -64,6 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     controller: _emailController,
                     decoration: const InputDecoration(
                         labelText: 'Email', hintText: 'Enter a valid email'),
+                    keyboardType: TextInputType.emailAddress,
                     validator: (String? value) =>
                         (value!.isEmpty || !value.contains('@'))
                             ? 'Email is not valid'
@@ -97,8 +92,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               text: 'Register',
               onTap: () async {
                 if (_formKey.currentState!.validate()) {
-                  await authenticationNotifier.signUpUser(
-                    context,
+                  await signUpUser(
                     email: _emailController.text,
                     password: _passwordController.text,
                   );
@@ -108,6 +102,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
             )
           ],
         ),
+      ),
+    );
+  }
+
+  Future<void> signUpUser(
+      {required String email, required String password}) async {
+    GotrueSessionResponse response =
+        await SuperbaseCredentials.supabaseClient.auth.signUp(email, password);
+
+    if (response.data != null) {
+      String? userEmail = response.data!.user!.email;
+      print("SignUp Successful : $userEmail");
+
+      Navigator.pushReplacementNamed(context, '/signin');
+      _showDialog(context, title: 'Success', message: 'Register Successful');
+    } else if (response.error?.message != null) {
+      _showDialog(context, title: 'Error', message: response.error?.message);
+    }
+  }
+
+  void _showDialog(context, {String? title, String? message}) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title ?? ''),
+        content: Text(message ?? ''),
+        actions: <Widget>[
+          MaterialButton(
+            child: const Text("Close"),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
       ),
     );
   }

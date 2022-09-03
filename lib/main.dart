@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:supa_auth/constants/authentication.notifier.dart';
+import 'package:supa_auth/constants/constants.dart';
 import 'package:supa_auth/screens/forget.dart';
 import 'package:supa_auth/screens/home.dart';
 import 'package:supa_auth/screens/register.dart';
-import 'package:supa_auth/screens/sign_in.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: SuperbaseCredentials.url,
+    anonKey: SuperbaseCredentials.key,
+  );
   runApp(const MyApp());
 }
 
@@ -15,10 +20,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => AuthenticationNotifier(),
-      child: const Core(),
-    );
+    return const Core();
   }
 }
 
@@ -33,9 +35,9 @@ class Core extends StatelessWidget {
       title: 'Supabase Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Poppins', primarySwatch: Colors.green),
-      initialRoute: 'signin',
+      initialRoute: '/signin',
       routes: {
-        'signin': (_) => const SignInScreen(),
+        '/signin': (_) => const RedirectUserBasedOnAuthState(),
         '/register': (_) => const RegisterScreen(),
         '/home': (_) => const HomeScreen(),
         '/forget': (_) => const ForgetPasswordScreen()
