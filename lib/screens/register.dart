@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:supa_auth/constants/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -10,17 +12,17 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
       TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -39,23 +41,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   .headline5!
                   .copyWith(fontWeight: FontWeight.bold),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const Text('Already having an account?'),
-                TextButton(
-                  onPressed: () => Navigator.pushNamed(context, '/signin'),
-                  child: const Text('Sign In'),
-                )
-              ],
-            ),
-            spacer,
             Form(
               key: _formKey,
               child: Column(
                 children: [
                   TextFormField(
-                    controller: _emailController,
+                    controller: emailController,
                     decoration: const InputDecoration(
                         labelText: 'Email', hintText: 'Enter a valid email'),
                     keyboardType: TextInputType.emailAddress,
@@ -66,7 +57,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   TextFormField(
                     obscureText: true,
-                    controller: _passwordController,
+                    controller: passwordController,
                     decoration: const InputDecoration(
                         labelText: 'Password',
                         hintText: 'Enter secure password'),
@@ -74,13 +65,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         value!.isEmpty ? 'Invalid password' : null,
                   ),
                   TextFormField(
-                    controller: _confirmPasswordController,
+                    controller: confirmPasswordController,
                     decoration: const InputDecoration(
                       labelText: 'Confirm password',
                       hintText: 'Repeat password',
                     ),
                     validator: (String? value) =>
-                        (value != _passwordController.text || value!.isEmpty)
+                        (value != passwordController.text || value!.isEmpty)
                             ? 'Password!=Confirm passsword'
                             : null,
                   ),
@@ -93,13 +84,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
               onTap: () async {
                 if (_formKey.currentState!.validate()) {
                   await signUpUser(
-                    email: _emailController.text,
-                    password: _passwordController.text,
+                    email: emailController.text,
+                    password: passwordController.text,
                   );
                 }
               },
               width: MediaQuery.of(context).size.width,
-            )
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Already having an account?'),
+                TextButton(
+                  onPressed: () => Navigator.pushNamed(context, '/signin'),
+                  child: const Text('Sign In'),
+                )
+              ],
+            ),
           ],
         ),
       ),
@@ -114,9 +115,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (response.data != null) {
       String? userEmail = response.data!.user!.email;
       print("SignUp Successful : $userEmail");
+      _showDialog(context,
+          title: 'Success',
+          message: 'Register Successful\nReturn to SignIn in 5s');
 
-      Navigator.pushReplacementNamed(context, '/signin');
-      _showDialog(context, title: 'Success', message: 'Register Successful');
+      Future.delayed(const Duration(seconds: 5), () {
+        Navigator.pushReplacementNamed(context, '/signin');
+      });
     } else if (response.error?.message != null) {
       _showDialog(context, title: 'Error', message: response.error?.message);
     }

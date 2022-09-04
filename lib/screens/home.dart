@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:supa_auth/constants/constants.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final user = SuperbaseCredentials.supabaseClient.auth.user();
@@ -14,9 +19,7 @@ class HomeScreen extends StatelessWidget {
           Text(user!.email.toString()),
           SuperButton(
             text: 'LogOut',
-            onTap: () {
-              logout(context);
-            },
+            onTap: () => logout(context),
             width: double.infinity,
           ),
         ],
@@ -26,6 +29,5 @@ class HomeScreen extends StatelessWidget {
 
   Future<void> logout(context) async {
     await SuperbaseCredentials.supabaseClient.auth.signOut();
-    Navigator.pushNamed(context, '/signin');
   }
 }

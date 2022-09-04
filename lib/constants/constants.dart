@@ -11,6 +11,57 @@ class SuperbaseCredentials {
   static SupabaseClient supabaseClient = SupabaseClient(url, key);
 }
 
+class RedirectBasedOnAuthStateState extends SupabaseAuthState {
+  @override
+  void initState() {
+    recoverSupabaseSession();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const CircularProgressIndicator();
+  }
+
+  @override
+  void onAuthenticated(Session session) {
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: ((context) => const HomeScreen())),
+        (_) => false);
+  }
+
+  @override
+  void onUnauthenticated() {
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: ((context) => const SignInScreen())),
+        (_) => false);
+  }
+
+  @override
+  void onErrorAuthenticating(String message) {}
+
+  @override
+  void onPasswordRecovery(Session session) {}
+}
+
+extension ShowSnackBar on BuildContext {
+  void showSnackBar({
+    required String message,
+    Color backgroundColor = Colors.white,
+  }) {
+    ScaffoldMessenger.of(this).showSnackBar(SnackBar(
+      content: Text(message),
+      backgroundColor: backgroundColor,
+      margin: const EdgeInsets.all(8),
+      behavior: SnackBarBehavior.floating,
+    ));
+  }
+
+  void showErrorSnackBar({required String message}) {
+    showSnackBar(message: message, backgroundColor: Colors.red);
+  }
+}
+
 Widget spacer = const SizedBox(height: 20);
 
 class SuperButton extends StatelessWidget {
@@ -35,73 +86,5 @@ class SuperButton extends StatelessWidget {
         child: Text(text),
       ),
     );
-  }
-}
-
-class RedirectUserBasedOnAuthState extends StatefulWidget {
-  const RedirectUserBasedOnAuthState({super.key});
-
-  @override
-  State<RedirectUserBasedOnAuthState> createState() =>
-      _RedirectUserBasedOnAuthStateState();
-}
-
-class _RedirectUserBasedOnAuthStateState
-    extends SupabaseAuthState<RedirectUserBasedOnAuthState> {
-  @override
-  void initState() {
-    recoverSupabaseSession();
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const SignInScreen();
-  }
-
-  @override
-  void onAuthenticated(Session session) {
-    if (mounted) {
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: ((context) => const HomeScreen())),
-      );
-    }
-  }
-
-  @override
-  void onErrorAuthenticating(String message) {
-    context.showErrorSnackBar(message: message);
-  }
-
-  @override
-  void onPasswordRecovery(Session session) {
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: ((context) => const SignInScreen())),
-        (route) => false);
-  }
-
-  @override
-  void onUnauthenticated() {
-    if (mounted) {
-      Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: ((context) => const SignInScreen())),
-          (route) => false);
-    }
-  }
-}
-
-extension ShowSnackBar on BuildContext {
-  void showSnackBar({
-    required String message,
-    Color backgroundColor = Colors.white,
-  }) {
-    ScaffoldMessenger.of(this).showSnackBar(SnackBar(
-      content: Text(message),
-      backgroundColor: backgroundColor,
-    ));
-  }
-
-  void showErrorSnackBar({required String message}) {
-    showSnackBar(message: message, backgroundColor: Colors.red);
   }
 }

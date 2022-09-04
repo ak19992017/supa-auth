@@ -3,6 +3,7 @@ import 'package:supa_auth/constants/constants.dart';
 import 'package:supa_auth/screens/forget.dart';
 import 'package:supa_auth/screens/home.dart';
 import 'package:supa_auth/screens/register.dart';
+import 'package:supa_auth/screens/sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -37,7 +38,7 @@ class Core extends StatelessWidget {
       theme: ThemeData(fontFamily: 'Poppins', primarySwatch: Colors.green),
       initialRoute: '/signin',
       routes: {
-        '/signin': (_) => const RedirectUserBasedOnAuthState(),
+        '/signin': (_) => const SignInScreen(),
         '/register': (_) => const RegisterScreen(),
         '/home': (_) => const HomeScreen(),
         '/forget': (_) => const ForgetPasswordScreen()
