@@ -123,6 +123,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       emailController.clear();
       passwordController.clear();
+      confirmPasswordController.clear();
 
       String? userEmail = response.user!.email;
       print("SignUp Successful : $userEmail");

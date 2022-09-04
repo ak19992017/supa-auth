@@ -36,7 +36,7 @@ class Core extends StatelessWidget {
         default:
           break;
       }
-    });
+    }).data;
     return MaterialApp(
       title: 'Supabase Demo',
       debugShowCheckedModeBanner: false,
@@ -45,6 +45,7 @@ class Core extends StatelessWidget {
           ? '/home'
           : '/signin',
       routes: {
+        '/': (_) => const SignInScreen(),
         '/signin': (_) => const SignInScreen(),
         '/register': (_) => const RegisterScreen(),
         '/home': (_) => const HomeScreen(),

@@ -45,6 +45,7 @@ class _SignInScreenState extends State<SignInScreen> {
               child: Column(
                 children: [
                   TextFormField(
+                    controller: emailController,
                     decoration: const InputDecoration(labelText: 'Email'),
                     keyboardType: TextInputType.emailAddress,
                     validator: (String? value) {
@@ -55,6 +56,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     },
                   ),
                   TextFormField(
+                    controller: passwordController,
                     obscureText: true,
                     decoration: const InputDecoration(labelText: 'Password'),
                     validator: (String? value) {
@@ -78,8 +80,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   : () async {
                       if (_formKey.currentState!.validate()) {
                         signInUser(
-                          email: emailController.text.trim().toString(),
-                          password: passwordController.text.trim().toString(),
+                          email: emailController.text,
+                          password: passwordController.text,
                         );
                       }
                     },
@@ -104,8 +106,6 @@ class _SignInScreenState extends State<SignInScreen> {
     setState(() {
       _isLoading = true;
     });
-    print(email);
-    print(password);
     try {
       GotrueSessionResponse response =
           await SuperbaseCredentials.supabaseClient.auth.signIn(
@@ -116,7 +116,6 @@ class _SignInScreenState extends State<SignInScreen> {
               kIsWeb ? null : 'io.supabase.flutterquickstart://login-callback/',
         ),
       );
-
       emailController.clear();
       passwordController.clear();
 
@@ -125,8 +124,6 @@ class _SignInScreenState extends State<SignInScreen> {
 
       Navigator.pushReplacementNamed(context, '/home');
     } catch (error) {
-      print(email);
-      print(password);
       _showDialog(context, title: 'Error', message: error.toString());
     }
 
