@@ -9,17 +9,26 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final user = SuperbaseCredentials.supabaseClient.auth.currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    if (user == null) {
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil('/signin', (route) => false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = SuperbaseCredentials.supabaseClient.auth.user();
-
     return Scaffold(
       body: Column(
         children: [
           Text(user!.email.toString()),
           SuperButton(
             text: 'LogOut',
-            onTap: () => logout(context),
+            onTap: () => logOut(context),
             width: double.infinity,
           ),
         ],
@@ -27,7 +36,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> logout(context) async {
-    await SuperbaseCredentials.supabaseClient.auth.signOut();
+  Future<void> logOut(context) async {
+    try {
+      await SuperbaseCredentials.supabaseClient.auth.signOut();
+    } catch (error) {
+      context.showErrorSnackBar(message: error.toString());
+    }
   }
 }

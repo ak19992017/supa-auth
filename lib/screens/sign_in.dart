@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:supa_auth/constants/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -15,6 +16,7 @@ class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -53,6 +55,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     },
                   ),
                   TextFormField(
+                    obscureText: true,
                     decoration: const InputDecoration(labelText: 'Password'),
                     validator: (String? value) {
                       if (value!.isEmpty) {
@@ -69,15 +72,17 @@ class _SignInScreenState extends State<SignInScreen> {
                 child: const Text('Forgot Password?')),
             spacer,
             SuperButton(
-              text: 'Sign In',
-              onTap: () async {
-                if (_formKey.currentState!.validate()) {
-                  await signInUser(
-                    email: emailController.text,
-                    password: passwordController.text,
-                  );
-                }
-              },
+              text: _isLoading ? "Loading" : 'Sign In',
+              onTap: _isLoading
+                  ? null
+                  : () async {
+                      if (_formKey.currentState!.validate()) {
+                        signInUser(
+                          email: emailController.text.trim().toString(),
+                          password: passwordController.text.trim().toString(),
+                        );
+                      }
+                    },
               width: MediaQuery.of(context).size.width,
             ),
             Row(
@@ -95,19 +100,39 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  Future<void> signInUser(
-      {required String email, required String password}) async {
-    GotrueSessionResponse response = await SuperbaseCredentials
-        .supabaseClient.auth
-        .signIn(email: email, phone: null, password: password);
+  void signInUser({required String email, required String password}) async {
+    setState(() {
+      _isLoading = true;
+    });
+    print(email);
+    print(password);
+    try {
+      GotrueSessionResponse response =
+          await SuperbaseCredentials.supabaseClient.auth.signIn(
+        email: email,
+        password: password,
+        options: const AuthOptions(
+          redirectTo:
+              kIsWeb ? null : 'io.supabase.flutterquickstart://login-callback/',
+        ),
+      );
 
-    if (response.data != null) {
-      String? userEmail = response.data!.user!.email;
+      emailController.clear();
+      passwordController.clear();
+
+      String? userEmail = response.user!.email;
       print("SignIn Successful : $userEmail");
+
       Navigator.pushReplacementNamed(context, '/home');
-    } else if (response.error?.message != null) {
-      _showDialog(context, title: 'Error', message: response.error?.message);
+    } catch (error) {
+      print(email);
+      print(password);
+      _showDialog(context, title: 'Error', message: error.toString());
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   void _showDialog(context, {String? title, String? message}) {
@@ -115,7 +140,7 @@ class _SignInScreenState extends State<SignInScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(title ?? ''),
-        content: Text(message ?? ''),
+        content: SelectableText(message ?? ''),
         actions: <Widget>[
           MaterialButton(
             child: const Text("Close"),

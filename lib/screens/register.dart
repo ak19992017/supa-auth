@@ -17,6 +17,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController confirmPasswordController =
       TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -80,15 +81,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             spacer,
             SuperButton(
-              text: 'Register',
-              onTap: () async {
-                if (_formKey.currentState!.validate()) {
-                  await signUpUser(
-                    email: emailController.text,
-                    password: passwordController.text,
-                  );
-                }
-              },
+              text: _isLoading ? 'Loading' : 'Register',
+              onTap: _isLoading
+                  ? null
+                  : () async {
+                      if (_formKey.currentState!.validate()) {
+                        await signUpUser(
+                          email: emailController.text,
+                          password: passwordController.text,
+                        );
+                      }
+                    },
               width: MediaQuery.of(context).size.width,
             ),
             Row(
@@ -109,22 +112,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> signUpUser(
       {required String email, required String password}) async {
-    GotrueSessionResponse response =
-        await SuperbaseCredentials.supabaseClient.auth.signUp(email, password);
+    setState(() {
+      _isLoading = true;
+    });
 
-    if (response.data != null) {
-      String? userEmail = response.data!.user!.email;
+    try {
+      GotrueSessionResponse response = await SuperbaseCredentials
+          .supabaseClient.auth
+          .signUp(email, password);
+
+      emailController.clear();
+      passwordController.clear();
+
+      String? userEmail = response.user!.email;
       print("SignUp Successful : $userEmail");
-      _showDialog(context,
-          title: 'Success',
-          message: 'Register Successful\nReturn to SignIn in 5s');
 
-      Future.delayed(const Duration(seconds: 5), () {
-        Navigator.pushReplacementNamed(context, '/signin');
-      });
-    } else if (response.error?.message != null) {
-      _showDialog(context, title: 'Error', message: response.error?.message);
+      _showDialog(context,
+          title: 'Success', message: 'Register Successful\nGo to SignIn in 5s');
+
+      Future.delayed(const Duration(seconds: 5),
+          () => Navigator.pushReplacementNamed(context, '/signin'));
+    } catch (error) {
+      _showDialog(context, title: 'Error', message: error.toString());
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   void _showDialog(context, {String? title, String? message}) {

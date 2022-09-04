@@ -13,16 +13,7 @@ Future<void> main() async {
     url: SuperbaseCredentials.url,
     anonKey: SuperbaseCredentials.key,
   );
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Core();
-  }
+  runApp(const Core());
 }
 
 class Core extends StatelessWidget {
@@ -32,11 +23,27 @@ class Core extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Supabase.instance.client.auth.onAuthStateChange((event, session) {
+      switch (event) {
+        case AuthChangeEvent.signedIn:
+          Navigator.of(context)
+              .pushNamedAndRemoveUntil('/home', (route) => false);
+          break;
+        case AuthChangeEvent.signedOut:
+          Navigator.of(context)
+              .pushNamedAndRemoveUntil('/signin', (route) => false);
+          break;
+        default:
+          break;
+      }
+    });
     return MaterialApp(
       title: 'Supabase Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Poppins', primarySwatch: Colors.green),
-      initialRoute: '/signin',
+      initialRoute: Supabase.instance.client.auth.currentUser != null
+          ? '/home'
+          : '/signin',
       routes: {
         '/signin': (_) => const SignInScreen(),
         '/register': (_) => const RegisterScreen(),
