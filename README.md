@@ -6,6 +6,11 @@ A Flutter project to walkthrough the Login using Supabase.
 
 :red_circle:[Click Here](https://supa-auth.codemagic.app/)
 
+
+## :v: Video
+https://user-images.githubusercontent.com/71957886/188470315-40b2fa0f-7368-49b2-8541-c5d9b51c83cc.mp4
+
+
 ## :v:Feature list
 
 :white_check_mark: Login using Email & Password <br>
