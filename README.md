@@ -19,5 +19,6 @@ https://user-images.githubusercontent.com/71957886/188470315-40b2fa0f-7368-49b2-
 :x: Login with Magic link <br>
 :x: Login with Google <br>
 :x: Login with Apple <br>
+:x: Upload/Change profile pic <br>
 
 *Email confirmation turned off
