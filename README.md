@@ -1,17 +1,16 @@
-# supa_auth
+# Supa Auth
 
-A new Flutter project.
+A Flutter project to walkthrough the Login using Supabase.
 
-## Getting Started
+## :v:Demo link
 
-This project is a starting point for a Flutter application.
+:red_circle:[Click Here](https://supa-auth.codemagic.app/)
 
-A few resources to get you started if this is your first Flutter project:
+## :v:Feature list
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# supa_auth
+:white_check_mark: Login using Email & Password <br>
+:x: Forget password <br>
+:x: Login with Phone number <br>
+:x: Login with Magic link <br>
+:x: Login with Google <br>
+:x: Login with Apple <br>
