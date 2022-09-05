@@ -30,82 +30,94 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Register',
-              style: Theme.of(context)
-                  .textTheme
-                  .headline5!
-                  .copyWith(fontWeight: FontWeight.bold),
-            ),
-            Form(
-              key: _formKey,
+      body: Row(
+        children: [
+          if (MediaQuery.of(context).size.width > 700)
+            Expanded(flex: 3, child: Container(color: Colors.black)),
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  TextFormField(
-                    controller: emailController,
-                    decoration: const InputDecoration(
-                        labelText: 'Email', hintText: 'Enter a valid email'),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (String? value) =>
-                        (value!.isEmpty || !value.contains('@'))
-                            ? 'Email is not valid'
-                            : null,
+                  Text(
+                    'Register',
+                    style: Theme.of(context)
+                        .textTheme
+                        .headline5!
+                        .copyWith(fontWeight: FontWeight.bold),
                   ),
-                  TextFormField(
-                    obscureText: true,
-                    controller: passwordController,
-                    decoration: const InputDecoration(
-                        labelText: 'Password',
-                        hintText: 'Enter secure password'),
-                    validator: (String? value) =>
-                        value!.isEmpty ? 'Invalid password' : null,
-                  ),
-                  TextFormField(
-                    controller: confirmPasswordController,
-                    decoration: const InputDecoration(
-                      labelText: 'Confirm password',
-                      hintText: 'Repeat password',
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: emailController,
+                          decoration: const InputDecoration(
+                              labelText: 'Email',
+                              hintText: 'Enter a valid email'),
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (String? value) =>
+                              (value!.isEmpty || !value.contains('@'))
+                                  ? 'Email is not valid'
+                                  : null,
+                        ),
+                        TextFormField(
+                          obscureText: true,
+                          controller: passwordController,
+                          decoration: const InputDecoration(
+                              labelText: 'Password',
+                              hintText: 'Enter secure password'),
+                          validator: (String? value) =>
+                              value!.isEmpty ? 'Invalid password' : null,
+                        ),
+                        TextFormField(
+                          controller: confirmPasswordController,
+                          decoration: const InputDecoration(
+                            labelText: 'Confirm password',
+                            hintText: 'Repeat password',
+                          ),
+                          validator: (String? value) =>
+                              (value != passwordController.text ||
+                                      value!.isEmpty)
+                                  ? 'Password!=Confirm passsword'
+                                  : null,
+                        ),
+                      ],
                     ),
-                    validator: (String? value) =>
-                        (value != passwordController.text || value!.isEmpty)
-                            ? 'Password!=Confirm passsword'
-                            : null,
+                  ),
+                  spacer,
+                  SuperButton(
+                    text: _isLoading ? 'Loading' : 'Register',
+                    onTap: _isLoading
+                        ? null
+                        : () async {
+                            if (_formKey.currentState!.validate()) {
+                              await signUpUser(
+                                email: emailController.text,
+                                password: passwordController.text,
+                              );
+                            }
+                          },
+                    width: MediaQuery.of(context).size.width,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Already having an account?'),
+                      TextButton(
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/signin'),
+                        child: const Text('Sign In'),
+                      )
+                    ],
                   ),
                 ],
               ),
             ),
-            spacer,
-            SuperButton(
-              text: _isLoading ? 'Loading' : 'Register',
-              onTap: _isLoading
-                  ? null
-                  : () async {
-                      if (_formKey.currentState!.validate()) {
-                        await signUpUser(
-                          email: emailController.text,
-                          password: passwordController.text,
-                        );
-                      }
-                    },
-              width: MediaQuery.of(context).size.width,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('Already having an account?'),
-                TextButton(
-                  onPressed: () => Navigator.pushNamed(context, '/signin'),
-                  child: const Text('Sign In'),
-                )
-              ],
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

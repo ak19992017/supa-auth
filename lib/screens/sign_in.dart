@@ -28,76 +28,87 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Welcome back',
-              style: Theme.of(context)
-                  .textTheme
-                  .headline5!
-                  .copyWith(fontWeight: FontWeight.bold),
-            ),
-            Form(
-              key: _formKey,
+      body: Row(
+        children: [
+          if (MediaQuery.of(context).size.width > 700)
+            Expanded(flex: 3, child: Container(color: Colors.black)),
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  TextFormField(
-                    controller: emailController,
-                    decoration: const InputDecoration(labelText: 'Email'),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (String? value) {
-                      if (value!.isEmpty || !value.contains('@')) {
-                        return 'Email is not valid';
-                      }
-                      return null;
-                    },
+                  Text(
+                    'Welcome back',
+                    style: Theme.of(context)
+                        .textTheme
+                        .headline5!
+                        .copyWith(fontWeight: FontWeight.bold),
                   ),
-                  TextFormField(
-                    controller: passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Password'),
-                    validator: (String? value) {
-                      if (value!.isEmpty) {
-                        return 'Invalid password';
-                      }
-                      return null;
-                    },
-                  )
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: emailController,
+                          decoration: const InputDecoration(labelText: 'Email'),
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (String? value) {
+                            if (value!.isEmpty || !value.contains('@')) {
+                              return 'Email is not valid';
+                            }
+                            return null;
+                          },
+                        ),
+                        TextFormField(
+                          controller: passwordController,
+                          obscureText: true,
+                          decoration:
+                              const InputDecoration(labelText: 'Password'),
+                          validator: (String? value) {
+                            if (value!.isEmpty) {
+                              return 'Invalid password';
+                            }
+                            return null;
+                          },
+                        )
+                      ],
+                    ),
+                  ),
+                  TextButton(
+                      onPressed: () => Navigator.pushNamed(context, '/forget'),
+                      child: const Text('Forgot Password?')),
+                  spacer,
+                  SuperButton(
+                    text: _isLoading ? "Loading" : 'Sign In',
+                    onTap: _isLoading
+                        ? null
+                        : () async {
+                            if (_formKey.currentState!.validate()) {
+                              signInUser(
+                                email: emailController.text,
+                                password: passwordController.text,
+                              );
+                            }
+                          },
+                    width: MediaQuery.of(context).size.width,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Don\'t have an account?'),
+                      TextButton(
+                          onPressed: () =>
+                              Navigator.pushNamed(context, '/register'),
+                          child: const Text('Register'))
+                    ],
+                  ),
                 ],
               ),
             ),
-            TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/forget'),
-                child: const Text('Forgot Password?')),
-            spacer,
-            SuperButton(
-              text: _isLoading ? "Loading" : 'Sign In',
-              onTap: _isLoading
-                  ? null
-                  : () async {
-                      if (_formKey.currentState!.validate()) {
-                        signInUser(
-                          email: emailController.text,
-                          password: passwordController.text,
-                        );
-                      }
-                    },
-              width: MediaQuery.of(context).size.width,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('Don\'t have an account?'),
-                TextButton(
-                    onPressed: () => Navigator.pushNamed(context, '/register'),
-                    child: const Text('Register'))
-              ],
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

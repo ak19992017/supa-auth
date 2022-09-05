@@ -45,7 +45,6 @@ class Core extends StatelessWidget {
           ? '/home'
           : '/signin',
       routes: {
-        '/': (_) => const SignInScreen(),
         '/signin': (_) => const SignInScreen(),
         '/register': (_) => const RegisterScreen(),
         '/home': (_) => const HomeScreen(),
